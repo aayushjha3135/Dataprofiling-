@@ -1,12 +1,43 @@
 # app.py
 import streamlit as st
 import pandas as pd
+import os
+from google.cloud import storage
+from google.cloud import aiplatform
 from profiler import profile_dataframe
 from pbl_generator import generate_pbl_for_column
 from chat_agent import answer_question_about_df
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Initialize GCP clients
+def init_gcp():
+    if os.getenv('GOOGLE_CLOUD_PROJECT'):
+        storage_client = storage.Client()
+        aiplatform.init(project=os.getenv('GOOGLE_CLOUD_PROJECT'))
+        return storage_client
+    return None
+
+def save_to_gcs(bucket_name, file_path, content):
+    """Save content to Google Cloud Storage"""
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(file_path)
+    blob.upload_from_string(content)
+    return f"gs://{bucket_name}/{file_path}"
+
+# Initialize GCP
+storage_client = init_gcp()
 
 st.set_page_config(page_title="Data Profiling AI Assistant", layout="wide")
-st.title("Data Profiling AI Assistant (Hackathon)")
+st.title("Data Profiling AI Assistant")
+
+# Add GCS bucket input if in cloud environment
+if storage_client:
+    gcs_bucket = st.text_input("GCS Bucket Name (optional)", 
+                              value=os.getenv('DEFAULT_BUCKET', ''))
 
 uploaded_file = st.file_uploader("Upload CSV / Excel file", type=['csv','xlsx'])
 if uploaded_file:

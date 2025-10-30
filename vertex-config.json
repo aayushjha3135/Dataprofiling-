@@ -1,0 +1,19 @@
+{
+    "displayName": "data-profiling-ai",
+    "description": "Data Profiling AI Application",
+    "container": {
+        "ports": [{"containerPort": 8080}],
+        "env": [
+            {"name": "PORT", "value": "8080"},
+            {"name": "HOST", "value": "0.0.0.0"},
+            {"name": "GOOGLE_CLOUD_PROJECT", "value": "wfargo-cdo25cbh-915"},
+            {"name": "DEFAULT_BUCKET", "value": "synthetic-data-194769473145"}
+        ]
+    },
+    "serviceAccount": "vertex-ai@wfargo-cdo25cbh-915.iam.gserviceaccount.com",
+    "machineType": "n1-standard-2",
+    "automaticScaling": {
+        "minReplicaCount": 1,
+        "maxReplicaCount": 3
+    }
+}
